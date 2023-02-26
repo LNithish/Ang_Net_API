@@ -1,4 +1,6 @@
+using Core.Interfaces;
 using Infrastructure.Data;
+using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,8 +17,13 @@ builder.Services.AddDbContext<StoreContext>(
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
 
+//Adding repository services
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+//Addscopd has lifetime until HTTP requst ends
+
+
 var app = builder.Build();
-    
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

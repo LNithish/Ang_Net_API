@@ -3,6 +3,7 @@ using Core.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Core.Interfaces;
 
 namespace API.Controllers
 {
@@ -11,24 +12,23 @@ namespace API.Controllers
     public class ProductsController : ControllerBase
     {
         //All th memory management are done by EF framework
-        private readonly StoreContext _storeContext;
+        private readonly IProductRepository productRepository;
 
-        public ProductsController(StoreContext storeContext)
+        public ProductsController(IProductRepository productRepository)
         {
-            _storeContext = storeContext;
+            this.productRepository = productRepository;
         }
 
-        //Asynchronous task allows other http requsts to process while the current task is running asynchronously
         [HttpGet]
         public async Task<ActionResult<List<Product>>> GetProducts()
         {
-            var products=await _storeContext.products.ToListAsync();
-            return products;
+            var products=await productRepository.GetProductsAsync();
+            return Ok(products);
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = await _storeContext.products.FindAsync(id);
+            var product = await productRepository.GetProductByIdAsync(id);
             return product;
         }
     }
