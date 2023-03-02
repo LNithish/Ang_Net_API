@@ -2,6 +2,7 @@ using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Writers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,5 +39,20 @@ app.UseAuthorization();
 
 //Maps requests with associated endpoints/action methods
 app.MapControllers();
+
+//Asynchronously applies any pending migration for the context to the database.
+//Will create the data if not already exists
+using var scope=app.Services.CreateScope();
+var services = scope.ServiceProvider;
+var context=services.GetRequiredService<StoreContext>();
+var logger=services.GetRequiredService<ILogger<Program>>();
+try
+{
+    await context.Database.MigrateAsync();
+}
+catch(Exception ex)
+{
+    logger.LogError(ex.Message, "An error occured during app startup migration");
+}
 
 app.Run();
