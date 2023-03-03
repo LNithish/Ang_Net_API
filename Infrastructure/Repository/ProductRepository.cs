@@ -24,14 +24,36 @@ namespace Infrastructure.Repository
 
         public async Task<Product> GetProductByIdAsync(int id)
         {
-            var product = await _storeContext.products.FindAsync(id);
+            var product = await _storeContext.products
+                //Eager loading of navigation properties to get brand,type values from foriegn key mapping
+                .Include(p => p.ProductBrand)
+                .Include(p => p.ProductType)
+                //Include does not have definition for findasync
+                //.FindAsync(id);
+                .FirstOrDefaultAsync(p=> p.Id==id);
             return product;
         }
 
         public async Task<IReadOnlyList<Product>> GetProductsAsync()
         {
-            var products = await _storeContext.products.ToListAsync();
+            var products = await _storeContext.products
+                //Eager loading of navigation properties to get brand,type values from foriegn key mapping
+                .Include(p=>p.ProductBrand)
+                .Include(p=>p.ProductType)
+                .ToListAsync();
             return products;
+        }
+
+        public async Task<IReadOnlyList<ProductBrand>> GetProductBrandsAsync()
+        {
+            var brands = await _storeContext.ProductBrands.ToListAsync();
+            return brands;
+        }
+
+        public async Task<IReadOnlyList<ProductType>> GetProductTypesAsync()
+        {
+            var types=await _storeContext.ProductTypes.ToListAsync();
+            return types;
         }
     }
 }
