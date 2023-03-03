@@ -49,8 +49,12 @@ var logger=services.GetRequiredService<ILogger<Program>>();
 try
 {
     await context.Database.MigrateAsync();
+
+    //Seeding data during start of application
+    await StoreContextSeed.SeedAsync(context);
+
 }
-catch(Exception ex)
+catch (Exception ex)
 {
     logger.LogError(ex.Message, "An error occured during app startup migration");
 }
