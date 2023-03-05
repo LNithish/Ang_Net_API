@@ -2,7 +2,6 @@ using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Writers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +19,8 @@ builder.Services.AddDbContext<StoreContext>(
 
 //Adding repository services
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+//Gneric repository service
+builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
 //Addscopd has lifetime until HTTP requst ends
 
 
