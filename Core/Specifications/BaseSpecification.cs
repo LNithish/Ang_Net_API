@@ -16,11 +16,12 @@ namespace Core.Specifications
         public List<Expression<Func<T, object>>> Includes { get;}
             =new List<Expression<Func<T, object>>>();
 
+        //Used when product ID is passed 
         public BaseSpecification(Expression<Func<T, bool>> criteria)
         {
             Criteria = criteria;
         }
-
+        //Used when no productID is passes/no criteria for filtering
         public BaseSpecification()
         {
         }

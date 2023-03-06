@@ -17,12 +17,13 @@ builder.Services.AddDbContext<StoreContext>(
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
 
+//Addscoped has lifetime until HTTP requst ends
 //Adding repository services
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 //Gneric repository service
 builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
-//Addscopd has lifetime until HTTP requst ends
-
+//adding automapper service to replace DTO codes
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 
@@ -32,6 +33,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+//Let the API serve static files like picture
+app.UseStaticFiles();
 
 //Below code is not rquired
 //app.UseHttpsRedirection();
