@@ -4,6 +4,8 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("[controller]")] //https://localhost:5001/WeatherForecast
+    //To avoid showing documentation of this API in swaggerUI
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]

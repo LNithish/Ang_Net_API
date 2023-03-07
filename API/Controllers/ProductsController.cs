@@ -4,12 +4,12 @@ using Core.Interfaces;
 using Core.Specifications;
 using API.DTOs;
 using AutoMapper;
+using API.Errors;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ProductsController : ControllerBase
+
+    public class ProductsController : BaseApiController
     {
         //All th memory management are done by EF framework
         private readonly IProductRepository productRepository;
@@ -60,6 +60,9 @@ namespace API.Controllers
             return Ok(productsMap);
         }
         [HttpGet("{id}")]
+        //Swagger documentation
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ProductToReturnDto>> GetProduct(int id)
         {
             //var product = await _productsRepo.GetByIdAsync(id);
@@ -67,6 +70,12 @@ namespace API.Controllers
             //Using Generic Repository with Specifications
             var spec=new ProductsWithTypesAndBrandsSpecification(id);
             var product=await _productsRepo.GetEntityWithSpec(spec);
+
+            //Error handling
+            if(product==null)
+            {
+                return NotFound(new ApiResponse(404));
+            }
             //using DTO to transfer only required detail to client 
             //var productDto = new ProductToReturnDto
             //{
