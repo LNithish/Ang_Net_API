@@ -16,9 +16,22 @@ namespace Core.Specifications
         public List<Expression<Func<T, object>>> Includes { get;}
             =new List<Expression<Func<T, object>>>();
 
-        //Used when product ID is passed 
+        //setting beloww sorting fields private so that value will only be assigned inside this class
+        //sorting fileds
+        public Expression<Func<T, object>> OrderBy { get; private set;}
+
+        public Expression<Func<T, object>> OrderByDescending { get; private set; }
+        //Pagination fields
+        public int Take { get; private set; }
+
+        public int Skip { get; private set; }
+
+        public bool IsPagingEnabled { get; private set; }
+
+        //Used when an expression is passed ,like product ID, brandID, typeID
         public BaseSpecification(Expression<Func<T, bool>> criteria)
         {
+            // criteria matches where condition
             Criteria = criteria;
         }
         //Used when no productID is passes/no criteria for filtering
@@ -30,6 +43,22 @@ namespace Core.Specifications
         protected void AddInclude(Expression<Func<T, object>> includeExpression)
         {
             Includes.Add(includeExpression);
+        }
+        //Sorting methods
+        protected void AddOrderBy(Expression<Func<T, object>> orderByExpression)
+        {
+            OrderBy=orderByExpression;
+        }
+        protected void AddOrderByDescending(Expression<Func<T, object>> orderByDescExpression)
+        {
+            OrderByDescending = orderByDescExpression;
+        }
+        //Pagination method
+        protected void ApplyPaging(int Skip,int Take)
+        {
+            this.Take = Take;
+            this.Skip = Skip;
+            IsPagingEnabled = true;
         }
     }
 }

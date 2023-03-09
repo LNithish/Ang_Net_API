@@ -28,7 +28,7 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
 //adding automapper service to replace DTO codes
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-//Configuring API Bhaviour to capturing validation error from the API
+//Configuring API Bhaviour to capturing validation error from the API/ like bad value in URL
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = ActionContext =>
@@ -40,10 +40,22 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
         var errorResponse = new ApiValidationErrorResponse
         {
-            Errors = errors
+            Errors = errors.Append("Error in the Client passed value from API URL")
         };
         return new BadRequestObjectResult(errorResponse);
     };
+});
+
+
+//CORS
+//CORS should be enabled and CORS header should be returned,
+//in order to let the browser to make use of API returning data
+builder.Services.AddCors(op =>
+{
+    op.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200");
+    });
 });
 
 var app = builder.Build();
@@ -69,6 +81,9 @@ app.UseStaticFiles();
 
 //Below code is not rquired
 //app.UseHttpsRedirection();
+
+//CORS middleware
+app.UseCors("CorsPolicy");
 
 app.UseAuthorization();
 

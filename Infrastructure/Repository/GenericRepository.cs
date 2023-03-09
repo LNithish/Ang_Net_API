@@ -44,10 +44,15 @@ namespace Infrastructure.Repository
             return await ApplySpecification(specification).FirstOrDefaultAsync();
         }
 
+        public async Task<int> CountAsync(ISpecification<T> specification)
+        {
+            return await ApplySpecification(specification).CountAsync();
+        }
+
         private IQueryable<T> ApplySpecification(ISpecification<T> spec)
         {
             return SpecificationEvaluator<T>.GetQuery(storeContext.Set<T>().AsQueryable(), spec);
         }
-
+                
     }
 }

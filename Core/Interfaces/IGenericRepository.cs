@@ -11,5 +11,7 @@ namespace Core.Interfaces
         //Spcification Methods
         Task<T> GetEntityWithSpec(ISpecification<T> specification);
         Task<IReadOnlyList<T>> ListAsync(ISpecification<T> specification);
+        //To get the count of records before pagination is applied
+        Task<int> CountAsync(ISpecification<T> specification);
     }
 }

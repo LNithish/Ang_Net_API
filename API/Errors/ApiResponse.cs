@@ -5,7 +5,7 @@
         public int StatusCode { get; set; }
         public string ErrorMessage { get; set; } = string.Empty;
 
-        //setting constructor variable to null allows it to be optional parameter
+        //setting constructor variable to null allows value to be assigned if not passed
         public ApiResponse(int statusCode, string errorMessage=null)
         {
             StatusCode = statusCode;
