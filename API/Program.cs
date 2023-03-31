@@ -6,6 +6,7 @@ using Infrastructure.Repository;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,12 +21,19 @@ builder.Services.AddDbContext<StoreContext>(
     options => {
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
-
+//Connection to Redis DB, using IConnectionMultiplexer API from stackexchange.Redis
+builder.Services.AddSingleton<IConnectionMultiplexer>(c =>
+{
+    var options = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis"));
+    return ConnectionMultiplexer.Connect(options);
+});
 //Addscoped has lifetime until HTTP requst ends
 //Adding repository services
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 //Gneric repository service
 builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
+//Adding Redis Service
+builder.Services.AddScoped<IBasketRepository,BasketRepository>();
 //adding automapper service to replace DTO codes
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 //Configuring API Bhaviour to capturing validation error from the API/ like bad value in URL

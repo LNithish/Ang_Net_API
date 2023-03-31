@@ -1,0 +1,27 @@
+services:
+#Redis service docker instruction
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+#Command to run the Redis server inside Docker container
+    command: ["redis-server", "--appendonly", "yes"]
+#Using volume for data persistance
+    volumes:
+      - redis-data:/data
+
+#redis-commander is a tools to manage redis and its data
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+      - HTTP_USER=root
+      - HTTP_PASSWORD=secret
+    ports:
+      - 8081:8081
+    depends_on:
+#depends on above redis service
+      - redis
+    
+volumes:
+  redis-data:
