@@ -1,5 +1,6 @@
 ﻿using API.Errors;
 using Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,6 +25,16 @@ namespace API.Controllers
             }
             return Ok();
         }
+
+        [HttpGet("testauth")]
+        [Authorize]
+        //Authorize attribute only allows the authorized user to access the endpoint GetSecretText
+        public ActionResult<string> GetSecretText()
+        {
+            return "Secret Message here, Only authorizd user(logged in user/not able to access it unless " +
+                "a valid JWT token is send from the user to the server) can access";
+        }
+
         [HttpGet("servererror")]
         public ActionResult GetServerError()
         {

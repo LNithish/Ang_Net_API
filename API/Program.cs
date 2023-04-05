@@ -1,12 +1,19 @@
 using API.Errors;
 using API.Middleware;
+using Core.Entities.Identity;
 using Core.Interfaces;
 using Infrastructure.Data;
+using Infrastructure.Identity;
 using Infrastructure.Repository;
+using Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +23,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
 //DB connection
 builder.Services.AddDbContext<StoreContext>(
     options => {
@@ -27,6 +36,14 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(c =>
     var options = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis"));
     return ConnectionMultiplexer.Connect(options);
 });
+//adding identity DB Connction
+builder.Services.AddDbContext<AppIdentityDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
+});
+
+
+
 //Addscoped has lifetime until HTTP requst ends
 //Adding repository services
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -36,6 +53,40 @@ builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository
 builder.Services.AddScoped<IBasketRepository,BasketRepository>();
 //adding automapper service to replace DTO codes
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+//adding Itoken service
+builder.Services.AddScoped<ITokenService, TokenService>();
+//adding Identity service
+builder.Services.AddIdentityCore<AppUser>(options =>
+{
+    //We can add different identity options here
+})
+    //Below function will create necessary tables to store created users
+    .AddEntityFrameworkStores<AppIdentityDbContext>()
+    .AddSignInManager<SignInManager<AppUser>>();
+//first AddAuthentication comes befor AddAuthorization
+//Setting up Identity to use tokens(Adding JwtBearerDefaults is type of authentication)
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        //options are instructions to validate the token
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            //any JWT token will be accepted if not validated
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Token:Key"])),
+            ValidIssuer = builder.Configuration["Token:Issuer"],
+            ValidateIssuer = true,
+            //validate audience will validate client application domain where it is hosted on,
+            //it will notify that token only from validated audience will be accepted
+            //As per microsoft default ValidateAudience will be true
+            ValidateAudience=false
+
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+
 //Configuring API Bhaviour to capturing validation error from the API/ like bad value in URL
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
@@ -93,6 +144,9 @@ app.UseStaticFiles();
 //CORS middleware
 app.UseCors("CorsPolicy");
 
+//authentication is added above UseAuthorization as part of identity
+//User should have access to perform action until they are authenticated
+app.UseAuthentication();
 app.UseAuthorization();
 
 //Maps requests with associated endpoints/action methods
@@ -103,13 +157,18 @@ app.MapControllers();
 using var scope=app.Services.CreateScope();
 var services = scope.ServiceProvider;
 var context=services.GetRequiredService<StoreContext>();
-var logger=services.GetRequiredService<ILogger<Program>>();
+//adding Identity,userManager context for seeding data 
+var identitycontext = services.GetRequiredService<AppIdentityDbContext>();
+var userManager = services.GetRequiredService<UserManager<AppUser>>();
+var logger =services.GetRequiredService<ILogger<Program>>();
 try
 {
+    //Migrating database
     await context.Database.MigrateAsync();
-
+    await identitycontext.Database.MigrateAsync();
     //Seeding data during start of application
     await StoreContextSeed.SeedAsync(context);
+    await AppIdentityDbContextSeed.SeedUserAsync(userManager);
 
 }
 catch (Exception ex)

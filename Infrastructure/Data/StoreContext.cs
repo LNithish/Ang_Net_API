@@ -7,7 +7,8 @@ namespace Infrastructure.Data
     public class StoreContext : DbContext
     {
         //Below options includes connection string
-        public StoreContext(DbContextOptions options) : base(options)
+        //we have to specify the type inside DBContextOptions as there is more than one DBContext
+        public StoreContext(DbContextOptions<StoreContext> options) : base(options)
         {
         }
         public DbSet<Product> products { get; set; }
