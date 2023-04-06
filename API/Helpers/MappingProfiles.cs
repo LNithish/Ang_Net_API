@@ -21,6 +21,11 @@ namespace API.Helpers
             //Creating MAP for AddressDto, ReverseMap allows vice versa also
             CreateMap<Address, AddressDto>().ReverseMap();
 
+            //Map for Basket
+            //Automapper will take care of mapping basketitem in CustomerBasketDto from BasketItemDto
+            CreateMap<BasketItemDto, BasketItem>();
+            CreateMap<CustomerBasketDto, CustomerBasket>();
+
         }
     }
 }

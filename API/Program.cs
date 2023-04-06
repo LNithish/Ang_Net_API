@@ -1,4 +1,5 @@
 using API.Errors;
+using API.Extensions;
 using API.Middleware;
 using Core.Entities.Identity;
 using Core.Interfaces;
@@ -20,9 +21,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//Adding swagger documntation servic from swagger extensions
+builder.Services.AddSwaggerDocumentation();
+
 
 
 //DB connection
@@ -131,8 +132,10 @@ app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    //Adding swagger middleware from swagger extensions
+    app.UseSwaggerDocumentation();
+    //app.UseSwagger();
+    //app.UseSwaggerUI();
 }
 
 //Let the API serve static files like picture
