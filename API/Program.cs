@@ -8,7 +8,6 @@ using Infrastructure.Identity;
 using Infrastructure.Repository;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -56,6 +55,10 @@ builder.Services.AddScoped<IBasketRepository,BasketRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 //adding Itoken service
 builder.Services.AddScoped<ITokenService, TokenService>();
+//adding order service
+builder.Services.AddScoped<IOrderService, OrderService>();
+//adding unitOfWork Service
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 //adding Identity service
 builder.Services.AddIdentityCore<AppUser>(options =>
 {

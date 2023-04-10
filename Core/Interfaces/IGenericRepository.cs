@@ -13,5 +13,10 @@ namespace Core.Interfaces
         Task<IReadOnlyList<T>> ListAsync(ISpecification<T> specification);
         //To get the count of records before pagination is applied
         Task<int> CountAsync(ISpecification<T> specification);
+        //below methods are not async reason is none of this are directly adding the changes to database.
+        //EF will only track it, it will be in memory
+        void Add(T entity);
+        void Update (T entity);
+        void Delete(T entity);
     }
 }

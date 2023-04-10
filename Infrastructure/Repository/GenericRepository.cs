@@ -53,6 +53,22 @@ namespace Infrastructure.Repository
         {
             return SpecificationEvaluator<T>.GetQuery(storeContext.Set<T>().AsQueryable(), spec);
         }
-                
+
+        public void Add(T entity)
+        {
+            //It will begin tracking the entity and its any reachable entity & update DB once savechanges called
+            storeContext.Set<T>().Add(entity);
+        }
+
+        public void Update(T entity)
+        {
+            storeContext.Set<T>().Attach(entity);
+            storeContext.Entry(entity).State = EntityState.Modified;
+        }
+
+        public void Delete(T entity)
+        {
+            storeContext.Set<T>().Remove(entity);
+        }
     }
 }
