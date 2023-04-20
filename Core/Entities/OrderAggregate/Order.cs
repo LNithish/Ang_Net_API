@@ -14,7 +14,7 @@ namespace Core.Entities.OrderAggregate
         }
 
         public Order(IReadOnlyList<OrderItem> orderItems, string buyerEmail,Address shipToAddress, DeliveryMethod deliveryMethod
-            , decimal subTotal)
+            , decimal subTotal,string paymentIntentId)
         {
             BuyerEmail = buyerEmail;
             //OrderDate is st to DateTime.UtcNow
@@ -26,7 +26,7 @@ namespace Core.Entities.OrderAggregate
             //Status will be set to Pending automatically for now
             //Status = status;
             //Need stripe to provide paymentintentid
-            //PaymentIntentId = paymentIntentId;
+            PaymentIntentId = paymentIntentId;
         }
 
         public string BuyerEmail { get; set; }

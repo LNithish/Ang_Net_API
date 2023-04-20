@@ -59,6 +59,8 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 //adding unitOfWork Service
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+//adding Stripe payment service
+builder.Services.AddScoped<IPaymentService,PaymentService>();
 //adding Identity service
 builder.Services.AddIdentityCore<AppUser>(options =>
 {
