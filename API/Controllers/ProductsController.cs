@@ -69,7 +69,9 @@ namespace API.Controllers
         //    return Ok(productsMap);
         //}
 
-
+        //adding cach attribute to implement caching mechanism on while getting products,
+        //passing 600 seconds for cache expiry time
+        [Cached(600)]
         [HttpGet]
        
         public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetProducts(
@@ -93,7 +95,7 @@ namespace API.Controllers
         }
 
 
-
+        [Cached(600)]
         [HttpGet("{id}")]
         //Swagger documentation
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -128,13 +130,17 @@ namespace API.Controllers
             var productmap =mapper.Map<Product,ProductToReturnDto>(product);
             return productmap;
         }
+
+        [Cached(600)]
         [HttpGet("brands")]
         public async Task<ActionResult<List<ProductBrand>>> GetProductBrands()
         {
             var brands= await _productBrandsRepo.ListAllAsync();
             //Ok response avoids list convrsion errors 
             return Ok(brands);
-        }    
+        }
+
+        [Cached(600)]
         [HttpGet("types")]
         public async Task<ActionResult<List<ProductType>>> GetProductTypes()
         {

@@ -61,6 +61,8 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 //adding Stripe payment service
 builder.Services.AddScoped<IPaymentService,PaymentService>();
+//adding cache service, it should be singleton so when application start service will be available,can be shared across all request come into our API
+builder.Services.AddSingleton<IResponseCacheService, ResponseCacheService>();
 //adding Identity service
 builder.Services.AddIdentityCore<AppUser>(options =>
 {
